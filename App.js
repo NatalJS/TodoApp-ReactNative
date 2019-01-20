@@ -3,7 +3,8 @@ import {
   createStackNavigator, createAppContainer
 } from 'react-navigation';
 import { 
-  StyleSheet, ScrollView, View, Text
+  StyleSheet, ScrollView, View, Text ,
+  PermissionsAndroid
 } from 'react-native';
 import TodoList from './components/todo-list';
 import AddTodo from './components/add-todo';
@@ -58,6 +59,33 @@ class Home extends Component {
       idCount: 3,
       todos: [todo1, todo2, todo3],
     }
+    this.requestMapsPermission();
+  }
+
+  async requestMapsPermission() {
+    try {
+      const isGranted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          'title': 'Todo app location access',
+          'message': 'We need your location to know here you created a todo'
+        }
+      )
+      this.setState({
+        geolocationPermissionGranted: isGranted,
+      })
+    } catch (err) {
+      return;
+    }
+  }  
+
+  async setTodoLocation(id, coords) {
+    const { latitude, longitude } = coords;
+    const { todoList } = this.state;
+    todoList.find(todo => todo.id === id).location = coords;
+    this.setState({
+      todoList: todoList
+    });
   }
 
   addTodo(text) {
@@ -66,6 +94,12 @@ class Home extends Component {
       todos: [{ id: id, text: text }].concat(this.state.todos),
       idCount: id
     });
+
+    if (this.state.geolocationPermissionGranted) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        this.setTodoLocation(id, pos.coords)
+      }, null, { enableHighAccuracy: true })
+    }
   }
   
   render() {
