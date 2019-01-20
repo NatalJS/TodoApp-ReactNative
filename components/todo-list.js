@@ -9,7 +9,7 @@ class TodoList extends React.Component {
         return (
           <Todo 
             navigation={this.props.navigation}
-            text={todo.text} 
+            todo={todo} 
           />
         );
       });

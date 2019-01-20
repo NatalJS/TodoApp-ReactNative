@@ -25,12 +25,15 @@ class TodoDetails extends Component {
     ...defaultNavigationOptions,
     title: 'Todo'
   }
-
   render() {
+    const todo = this.props.navigation.getParam('todo');
     return (
       <View>
         <Text>
-          {this.props.navigation.getParam('text')}
+          {todo.text}
+        </Text>
+        <Text>
+          Created at: {todo.location}
         </Text>
       </View>
     )
@@ -72,37 +75,44 @@ class Home extends Component {
         }
       )
       this.setState({
-        geolocationPermissionGranted: isGranted,
+        geolocationPermissionGranted: isGranted === 'granted',
       })
     } catch (err) {
-      return;
+      console.error(err);
     }
   }  
 
   async setTodoLocation(id, coords) {
     const { latitude, longitude } = coords;
-    
+    console.warn('oi');
     try {
       const response = await fetch(
-       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${API_KEY}`
+       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=`
       );
-      const data = response.json();
-      const address = data.results.formatted_address;
+      const data = await response.json();
       
-      const { todoList } = this.state;
-      todoList.find(todo => todo.id === id).location = address;
-      this.setState({
-        todoList: todoList
-      })
+      if (!data.error_message) {
+        const address = data.results[0].formatted_address;
+        
+        const { todos } = this.state;
+        todos
+          .find(todo => todo.id === id)
+          .location = address;
+        this.setState({
+          todos
+        })
+      } else {
+        throw JSON.stringify(data);
+      }
     } catch(e) {
-      return;
+      console.error(e);
     }
   }
 
   addTodo(text) {
     const id = this.state.idCount + 1;
     this.setState({
-      todos: [{ id: id, text: text }].concat(this.state.todos),
+      todos: [{ id, text }].concat(this.state.todos),
       idCount: id
     });
 
