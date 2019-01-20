@@ -81,11 +81,22 @@ class Home extends Component {
 
   async setTodoLocation(id, coords) {
     const { latitude, longitude } = coords;
-    const { todoList } = this.state;
-    todoList.find(todo => todo.id === id).location = coords;
-    this.setState({
-      todoList: todoList
-    });
+    
+    try {
+      const response = await fetch(
+       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${API_KEY}`
+      );
+      const data = response.json();
+      const address = data.results.formatted_address;
+      
+      const { todoList } = this.state;
+      todoList.find(todo => todo.id === id).location = address;
+      this.setState({
+        todoList: todoList
+      })
+    } catch(e) {
+      return;
+    }
   }
 
   addTodo(text) {
