@@ -3,7 +3,7 @@ import {
   createStackNavigator, createAppContainer
 } from 'react-navigation';
 import { 
-  StyleSheet, ScrollView, View, Text 
+  StyleSheet, ScrollView, View, Text
 } from 'react-native';
 import TodoList from './components/todo-list';
 import AddTodo from './components/add-todo';
@@ -46,22 +46,25 @@ class Home extends Component {
     super(props);
 
     const todo1 = {
-      text: 'fazer o app bonitao o/',
+      id: 1, text: 'fazer o app bonitao o/',
     };
     const todo2 = {
-      text: 'fazer o app maaais bonitao',
+      id: 2, text: 'fazer o app maaais bonitao',
     };
     const todo3 = {
-      text: 'lanchar',
+      id: 3, text: 'lanchar',
     };
     this.state = {
+      idCount: 3,
       todos: [todo1, todo2, todo3],
     }
   }
 
   addTodo(text) {
+    const id = this.state.idCount + 1;
     this.setState({
-      todos: [{ text: text }].concat(this.state.todos)
+      todos: [{ id: id, text: text }].concat(this.state.todos),
+      idCount: id
     });
   }
   
