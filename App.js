@@ -1,11 +1,50 @@
 import React, {Component} from 'react';
-import { StyleSheet, View } from 'react-native';
+import { 
+  createStackNavigator, createAppContainer
+} from 'react-navigation';
+import { 
+  StyleSheet, ScrollView, View, Text 
+} from 'react-native';
 import TodoList from './components/todo-list';
 import AddTodo from './components/add-todo';
 
-export default class App extends Component {
-  constructor() {
-    super();
+const defaultNavigationOptions = {
+  headerStyle: {
+    backgroundColor: '#1564bf',
+  },
+  headerTintColor: 'white',
+  headerTitleStyle: {
+    fontWeight: 'bold',
+    color: 'white',
+  },
+}
+
+class TodoDetails extends Component {
+  static navigationOptions = {
+    ...defaultNavigationOptions,
+    title: 'Todo'
+  }
+
+  render() {
+    return (
+      <View>
+        <Text>
+          {this.props.navigation.getParam('text')}
+        </Text>
+      </View>
+    )
+  }
+}
+
+class Home extends Component {
+  static navigationOptions = {
+    ...defaultNavigationOptions,
+    title: 'Todo App',
+  };
+
+  constructor(props) {
+    super(props);
+
     const todo1 = {
       text: 'fazer o app bonitao o/',
     };
@@ -22,15 +61,22 @@ export default class App extends Component {
 
   addTodo(text) {
     this.setState({
-      todos: this.state.todos.concat([{ text: text }])
+      todos: [{ text: text }].concat(this.state.todos)
     });
   }
   
   render() {
     return (
       <View style={styles.container}>
-        <AddTodo add={text => this.addTodo(text)}/>
-        <TodoList todoList={this.state.todos}/>
+        <ScrollView
+          contentContainerStyle={styles.scrollView}
+        >
+          <AddTodo add={text => this.addTodo(text)}/>
+          <TodoList 
+            todoList={this.state.todos}
+            navigation={this.props.navigation}
+          />
+        </ScrollView>
       </View>
     );
   }
@@ -39,18 +85,23 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F5FCFF',
+  },
+  scrollView: {
+    width: '100%',
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
-    backgroundColor: '#F5FCFF',
   },
   welcome: {
     fontSize: 20,
     textAlign: 'center',
     margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+  }
 });
+
+const AppNavigator = createStackNavigator({
+  Home: { screen: Home },
+  TodoDetails: { screen: TodoDetails }
+})
+
+export default createAppContainer(AppNavigator);
