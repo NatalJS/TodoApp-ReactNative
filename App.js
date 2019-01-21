@@ -84,15 +84,14 @@ class Home extends Component {
 
   async setTodoLocation(id, coords) {
     const { latitude, longitude } = coords;
-    console.warn('oi');
     try {
       const response = await fetch(
-       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=`
+       `https://nominatim.openstreetmap.org/reverse.php?format=json&lat=${latitude}&lon=${longitude}&zoom=18`
       );
-      const data = await response.json();
       
-      if (!data.error_message) {
-        const address = data.results[0].formatted_address;
+      if (!response.ok) {
+        const data = await response.json();
+        const address = `${data.address.suburb}, ${data.address.city}`;
         
         const { todos } = this.state;
         todos
@@ -102,7 +101,7 @@ class Home extends Component {
           todos
         })
       } else {
-        throw JSON.stringify(data);
+        throw JSON.stringify(response.json());
       }
     } catch(e) {
       console.error(e);
