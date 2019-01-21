@@ -89,7 +89,7 @@ class Home extends Component {
        `https://nominatim.openstreetmap.org/reverse.php?format=json&lat=${latitude}&lon=${longitude}&zoom=18`
       );
       
-      if (!response.ok) {
+      if (response.ok) {
         const data = await response.json();
         const address = `${data.address.suburb}, ${data.address.city}`;
         
